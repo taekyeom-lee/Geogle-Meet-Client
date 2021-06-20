@@ -11,4 +11,11 @@ export const connectWithWebSocket = () => {
     console.log('successfully connected with wss server');
     console.log(socket.id);
   });
-}
+};
+
+export const registerNewUser = (username) => {
+  socket.emit('register-new-user', {
+    username: username,
+    socketId: socket.id
+  });
+};
