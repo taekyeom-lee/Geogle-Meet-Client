@@ -1,5 +1,5 @@
 import store from '../../store/store';
-import { setLocalStream, setCallState, callStates, setCallingDialogVisible, setCallerUsername } from '../../store/actions/callActions';
+import { setLocalStream, setCallState, callStates, setCallingDialogVisible, setCallerUsername, setCallRejected } from '../../store/actions/callActions';
 import * as wss from '../wssConnection/wssConnection';
 
 const preOfferAnswers = {
@@ -40,7 +40,6 @@ export const callToOtherUser = (calleeDetails) => {
 };
 
 export const handlePreOffer = (data) => {
-
   if (checkIfCallIsPossible()) {
     connectedUserSocketId = data.callerSocketId;
     store.dispatch(setCallerUsername(data.callerUsername));
@@ -70,6 +69,8 @@ export const rejectIncomingCallRequest = () => {
 };
 
 export const handlePreOfferAnswer = (data) => {
+  store.dispatch(setCallingDialogVisible(false));
+
   if (data.answer === preOfferAnswers.CALL_ACCEPTED) {
     // send webRTC offer
   } else {
@@ -79,11 +80,15 @@ export const handlePreOfferAnswer = (data) => {
     } else {
       rejectionReason = 'Call rejected by the callee';
     }
+    store.dispatch(setCallRejected({
+      rejected: true,
+      reason: rejectionReason
+    }))
   }
-}
+};
 
 export const checkIfCallIsPossible = () => {
-  if (store.getState().call.localStream === null || store.getState().call.callStates !== callStates.CALL_AVAILABLE) {
+  if (store.getState().call.localStream === null || store.getState().call.callState !== callStates.CALL_AVAILABLE) {
     return false;
   } else {
     return true;
@@ -93,4 +98,4 @@ export const checkIfCallIsPossible = () => {
 export const resetCallData = () => {
   connectedUserSocketId = null;
   store.dispatch(setCallState(callStates.CALL_AVAILABLE));
-}
+};
