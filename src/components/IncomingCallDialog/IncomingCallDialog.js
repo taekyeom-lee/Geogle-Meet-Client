@@ -2,7 +2,7 @@ import React from 'react';
 
 import './IncomingCallDialog.css';
 
-const IncomingCallDialog = () => {
+const IncomingCallDialog = ({ callerUsername }) => {
 
   const handleAcceptButtonPressed = () => {
     // accept the call
