@@ -24,14 +24,45 @@ let peerConnection;
 
 export const getLocalStream = () => {
   navigator.mediaDevices.getUserMedia(defaultConstrains)
-  .then(stream => {
-    store.dispatch(setLocalStream(stream));
-    store.dispatch(setCallState(callStates.CALL_AVAILABLE));
-  })
-  .catch(err => {
-    console.log('error occured when trying to get an access to get local stream');
-    console.log(err);
-  });
+    .then(stream => {
+      store.dispatch(setLocalStream(stream));
+      store.dispatch(setCallState(callStates.CALL_AVAILABLE));
+      createPeerConnection();
+    })
+    .catch(err => {
+      console.log('error occured when trying to get an access to get local stream');
+      console.log(err);
+    });
+};
+
+const createPeerConnection = () => {
+  peerConnection = new RTCPeerConnection(configuration);
+
+  const localStream = store.getState().call.localStream;
+
+  for (const track of localStream.getTracks()) {
+    peerConnection.addTrack(track, localStream);
+  };
+
+  peerConnection.ontrack = ({ streams: [stream] }) => {
+    // dispatch remote stream in our store
+  };
+  
+  peerConnection.onicecandidate = (event) => {
+    console.log('geeting candidates from stun server');
+    if (event.candidate) {
+      wss.sendWebRTCCandidate({
+        candidate: event.candidate,
+        connectedUserSocketId: connectedUserSocketId
+      });
+    }
+  };
+
+  peerConnection.onconnectionstatechange = (event) => {
+    if (peerConnection.connectionState === 'connected') {
+      console.log('succesfully connected with other peer');
+    }
+  };
 };
 
 export const callToOtherUser = (calleeDetails) => {
@@ -46,29 +77,6 @@ export const callToOtherUser = (calleeDetails) => {
     }
   });
 };
-
-const createPeerConnection = () => {
-  peerConnection = new RTCPeerConnection(configuration);
-
-  const localStream = store.getState().call.localStream;
-
-  for (const track of localStream.getTrack()) {
-    peerConnection.addTrack(track, localStream);
-  };
-
-  peerConnection.ontrack = ({ streams: [stream] }) => {
-    // dispatch remote stream in our store
-  }
-  
-  peerConnection.onicecandidate = (event) => {
-    if (event.candidate) {
-      wss.sendWebRTCCandidate({
-        candidate: event.candidate,
-        connectedUserSocketId: connectedUserSocketId
-      })
-    }
-  }
-} 
 
 export const handlePreOffer = (data) => {
   if (checkIfCallIsPossible()) {
@@ -95,7 +103,6 @@ export const rejectIncomingCallRequest = () => {
     callerSocketId: connectedUserSocketId,
     answer: preOfferAnswers.CALL_REJECTED
   });
-
   resetCallData();
 };
 
@@ -135,12 +142,21 @@ export const handleOffer = async (data) => {
   await peerConnection.setLocalDescription(answer);
   wss.sendWebRTCAnswer({
     callerSocketId: connectedUserSocketId,
-    offer: offer
+    answer: answer
   });
 };
 
 export const handleAnswer = async (data) => {
   await peerConnection.setRemoteDescription(data.answer);
+};
+
+export const handleCandidate = async (data) => {
+  try {
+    console.log('adding ice candidates');
+    await peerConnection.addIceCandidate(data.candidate);
+  } catch (err) {
+    console.error('error occured when trying to add received ice candidate', err);
+  }
 };
 
 export const checkIfCallIsPossible = () => {
