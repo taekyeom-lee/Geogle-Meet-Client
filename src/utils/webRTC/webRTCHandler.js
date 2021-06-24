@@ -61,7 +61,12 @@ const createPeerConnection = () => {
   }
   
   peerConnection.onicecandidate = (event) => {
-    // send to connected user our ice candidates
+    if (event.candidate) {
+      wss.sendWebRTCCandidate({
+        candidate: event.candidate,
+        connectedUserSocketId: connectedUserSocketId
+      })
+    }
   }
 } 
 
@@ -131,12 +136,12 @@ export const handleOffer = async (data) => {
   wss.sendWebRTCAnswer({
     callerSocketId: connectedUserSocketId,
     offer: offer
-  })
-}
+  });
+};
 
 export const handleAnswer = async (data) => {
   await peerConnection.setRemoteDescription(data.answer);
-}
+};
 
 export const checkIfCallIsPossible = () => {
   if (store.getState().call.localStream === null || store.getState().call.callState !== callStates.CALL_AVAILABLE) {
