@@ -98,7 +98,7 @@ export const handlePreOfferAnswer = (data) => {
   store.dispatch(setCallingDialogVisible(false));
 
   if (data.answer === preOfferAnswers.CALL_ACCEPTED) {
-    // send webRTC offer
+    sendOffer();
   } else {
     let rejectionReason;
     if (data.answer === preOfferAnswers.CALL_NOT_AVAILABLE) {
@@ -123,6 +123,16 @@ const sendOffer = async () => {
     offer: offer
   });
 };
+
+export const handleOffer = async (data) => {
+  await peerConnection.setRemoteDescription(data.offer);
+  const answer = await peerConnection.createAnswer();
+  await peerConnection.setLocalDescription(answer);
+  wss.sendWebRTCAnswer({
+    callerSocketId: connectedUserSocketId,
+    offer: offer
+  })
+}
 
 export const checkIfCallIsPossible = () => {
   if (store.getState().call.localStream === null || store.getState().call.callState !== callStates.CALL_AVAILABLE) {
