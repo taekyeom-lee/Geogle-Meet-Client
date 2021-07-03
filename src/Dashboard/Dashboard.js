@@ -3,6 +3,7 @@ import logo from '../resources/logo.png';
 import ActiveUsersList from '../components/ActiveUsersList/ActiveUsersList';
 import DashboardInformation from '../components/DashboardInformation/DashboardInformation';
 import * as webRTCHandler from '../utils/webRTC/webRTCHandler';
+import * as webRTCGroupHandler from '../utils/webRTC/webRTCGroupCallHandler';
 import DirectCall from '../components/DirectCall/DirectCall';
 import { connect } from 'react-redux';
 import { callStates } from '../store/actions/callActions';
@@ -12,6 +13,7 @@ import './Dashboard.css';
 const Dashboard = ({ username, callState }) => {
   useEffect(() => {
     webRTCHandler.getLocalStream();
+    webRTCGroupHandler.connectWithMyPeer();
   }, []);
 
   return (
