@@ -7,6 +7,7 @@ import * as webRTCGroupHandler from '../utils/webRTC/webRTCGroupCallHandler';
 import DirectCall from '../components/DirectCall/DirectCall';
 import { connect } from 'react-redux';
 import { callStates } from '../store/actions/callActions';
+import GroupCallRoomsList from '../components/GroupCallRoomsList/GroupCallRoomsList';
 
 import './Dashboard.css';
 
@@ -24,7 +25,7 @@ const Dashboard = ({ username, callState }) => {
           {callState !== callStates.CALL_IN_PROGRESS && <DashboardInformation username={username} />}
         </div>
         <div className='dashboard_rooms_container background_secondary_color'>
-          rooms
+          <GroupCallRoomsList />
         </div>
       </div>
       <div className='dashboard_right_section background_secondary_color'>
