@@ -79,5 +79,5 @@ const addVideoStream = (incomingStream) => {
     incomingStream,
   ];
 
-  store.dispatch(setGroupCallIncomingStreams(groupCallStreams));
+  // store.dispatch(setGroupCallIncomingStreams(groupCallStreams));
 };

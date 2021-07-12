@@ -6,7 +6,7 @@ import * as webRTCGroupCallHandler from "../../utils/webRTC/webRTCGroupCallHandl
 import GroupCallRoom from "../GroupCallRoom/GroupCallRoom";
 
 const GroupCall = (props) => {
-  const { callState, localStream, groupCallActive } = props;
+  const { callState, localStream, groupCallActive, groupCallStreams } = props;
 
   const createRoom = () => {
     webRTCGroupCallHandler.createNewGroupCall();
@@ -19,7 +19,7 @@ const GroupCall = (props) => {
         callState !== callStates.CALL_IN_PROGRESS && (
           <GroupCallButton onClickHandler={createRoom} label="Create room" />
         )}
-      {groupCallActive && <GroupCallRoom />}
+      {groupCallActive && <GroupCallRoom groupCallStreams={groupCallStreams}/>}
     </>
   );
 };
