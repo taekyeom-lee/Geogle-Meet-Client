@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 
 const styles = {
   videoContainer: {
@@ -13,11 +13,11 @@ const styles = {
 
 const GroupCallVideo = ({ stream }) => {
   const videoRef = useRef();
-  
+
   useEffect(() => {
     const remoteGroupCallVideo = videoRef.current;
     remoteGroupCallVideo.srcObject = stream;
-    remoteGroupCallVideo.onloademetadata = () => {
+    remoteGroupCallVideo.onloadedmetadata = () => {
       remoteGroupCallVideo.play();
     };
   }, [stream]);

@@ -4,28 +4,28 @@ import {
   callStates,
   setCallState,
   setGroupCallActive,
+  setGroupCallIncomingStreams
 } from "../../store/actions/callActions";
 
 let myPeer;
 let myPeerId;
-
 export const connectWithMyPeer = () => {
   myPeer = new window.Peer(undefined, {
-    path: "/peerjs",
-    host: "/",
-    port: "5000",
+    path: '/peerjs',
+    host: '/',
+    port: '5000'
   });
 
-  myPeer.on("open", (id) => {
-    console.log("succesfully connected with peer server");
+  myPeer.on('open', (id) => {
+    console.log('succesfully connected with peer server');
     myPeerId = id;
   });
 
-  myPeer.on("call", (call) => {
+  myPeer.on('call', call => {
     call.answer(store.getState().call.localStream);
-    call.on("stream", (incomingStream) => {
+    call.on('stream', incomingStream => {
       const streams = store.getState().call.groupCallStreams;
-      const stream = streams.find((stream) => stream.id === incomingStream.id);
+      const stream = streams.find(stream => stream.id === incomingStream.id);
 
       if (!stream) {
         addVideoStream(incomingStream);
@@ -37,12 +37,13 @@ export const connectWithMyPeer = () => {
 export const createNewGroupCall = () => {
   wss.registerGroupCall({
     username: store.getState().dashboard.username,
-    peerId: myPeerId,
+    peerId: myPeerId
   });
 
   store.dispatch(setGroupCallActive(true));
   store.dispatch(setCallState(callStates.CALL_IN_PROGRESS));
-};
+}
+;
 
 export const joinGroupCall = (hostSocketId, roomId) => {
   const localStream = store.getState().call.localStream;
@@ -51,7 +52,7 @@ export const joinGroupCall = (hostSocketId, roomId) => {
     peerId: myPeerId,
     hostSocketId,
     roomId,
-    localStreamId: localStream.id,
+    localStreamId: localStream.id
   });
 
   store.dispatch(setGroupCallActive(true));
@@ -63,9 +64,9 @@ export const connectToNewUser = (data) => {
 
   const call = myPeer.call(data.peerId, localStream);
 
-  call.on("stream", (incomingStream) => {
+  call.on('stream', (incomingStream) => {
     const streams = store.getState().call.groupCallStreams;
-    const stream = streams.find((stream) => stream.id === incomingStream.id);
+    const stream = streams.find(stream => stream.id === incomingStream.id);
 
     if (!stream) {
       addVideoStream(incomingStream);
@@ -76,8 +77,8 @@ export const connectToNewUser = (data) => {
 const addVideoStream = (incomingStream) => {
   const groupCallStreams = [
     ...store.getState().call.groupCallStreams,
-    incomingStream,
+    incomingStream
   ];
 
-  // store.dispatch(setGroupCallIncomingStreams(groupCallStreams));
+  store.dispatch(setGroupCallIncomingStreams(groupCallStreams));
 };
