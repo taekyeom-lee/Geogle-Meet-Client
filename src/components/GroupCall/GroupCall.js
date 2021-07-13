@@ -12,6 +12,10 @@ const GroupCall = (props) => {
     webRTCGroupCallHandler.createNewGroupCall();
   };
 
+  const leaveRoom = () => {
+    webRTCGroupCallHandler.leaveGroupCall();
+  }
+
   return (
     <>
       {!groupCallActive &&
@@ -20,6 +24,7 @@ const GroupCall = (props) => {
           <GroupCallButton onClickHandler={createRoom} label="Create room" />
         )}
       {groupCallActive && <GroupCallRoom groupCallStreams={groupCallStreams} />}
+      {groupCallActive && <GroupCallButton onClickHandler={leaveRoom} label='Leave room' />}
     </>
   );
 };
