@@ -6,10 +6,12 @@ import {
   MdVideocam,
   MdVideocamOff,
   MdVideoLabel,
-  MdVideoCal,
   MdCamera,
 } from "react-icons/md";
-import { hangUp, switchForScreenSharingStream } from "../../utils/webRTC/webRTCHandler";
+import {
+  hangUp,
+  switchForScreenSharingStream,
+} from "../../utils/webRTC/webRTCHandler";
 import ConversationButton from "./ConversationButton";
 
 const styles = {
@@ -27,13 +29,14 @@ const styles = {
 };
 
 const ConversationButtons = (props) => {
-  const { 
-    localStream, 
-    localCameraEnabled, 
-    localMicrophoneEnabled, 
-    setCameraEnabled, 
+  const {
+    localStream,
+    localCameraEnabled,
+    localMicrophoneEnabled,
+    setCameraEnabled,
     setMicrophoneEnabled,
-    screenSharingActive
+    screenSharingActive,
+    groupCall,
   } = props;
 
   const handleMicButtonPressed = () => {
@@ -54,22 +57,38 @@ const ConversationButtons = (props) => {
 
   const handleHangUpButtonPressed = () => {
     hangUp();
-  }
+  };
 
   return (
     <div style={styles.buttonContainer}>
       <ConversationButton onClickHandler={handleMicButtonPressed}>
-        {localMicrophoneEnabled ? <MdMic style={styles.icon} /> : <MdMicOff style={styles.icon} />}
+        {localMicrophoneEnabled ? (
+          <MdMic style={styles.icon} />
+        ) : (
+          <MdMicOff style={styles.icon} />
+        )}
       </ConversationButton>
-      <ConversationButton onClickHandler={handleHangUpButtonPressed}>
-        <MdCallEnd style={styles.icon} />
-      </ConversationButton>
+      {!groupCall && (
+        <ConversationButton onClickHandler={handleHangUpButtonPressed}>
+          <MdCallEnd style={styles.icon} />
+        </ConversationButton>
+      )}
       <ConversationButton onClickHandler={handleCameraButtonPressed}>
-        {localCameraEnabled ? <MdVideocam style={styles.icon} /> : <MdVideocamOff style={styles.icon} /> }
+        {localCameraEnabled ? (
+          <MdVideocam style={styles.icon} />
+        ) : (
+          <MdVideocamOff style={styles.icon} />
+        )}
       </ConversationButton>
-      <ConversationButton onClickHandler={handleScreenSharingButtonPressed}>
-        {screenSharingActive ? <MdCamera style={styles.icon} /> : <MdVideoLabel style={styles.icon} />}
-      </ConversationButton>
+      {!groupCall && (
+        <ConversationButton onClickHandler={handleScreenSharingButtonPressed}>
+          {screenSharingActive ? (
+            <MdCamera style={styles.icon} />
+          ) : (
+            <MdVideoLabel style={styles.icon} />
+          )}
+        </ConversationButton>
+      )}
     </div>
   );
 };
