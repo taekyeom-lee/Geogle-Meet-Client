@@ -9,6 +9,7 @@ import {
   setCallRejected,
   setRemoteStream,
   setScreenSharingActive,
+  setMessage,
 } from "../../store/actions/callActions";
 import * as wss from "../wssConnection/wssConnection";
 
@@ -36,6 +37,7 @@ const configuration = {
 
 let connectedUserSocketId;
 let peerConnection;
+let dataChannel;
 
 export const getLocalStream = () => {
   navigator.mediaDevices
@@ -64,6 +66,25 @@ const createPeerConnection = () => {
 
   peerConnection.ontrack = ({ streams: [stream] }) => {
     store.dispatch(setRemoteStream(stream));
+  };
+
+  // incoming data channel messages
+  peerConnection.ondatachannel = (event) => {
+    const dataChannel = event.channel;
+
+    dataChannel.onopen = () => {
+      console.log("peer connection is ready to receive data channel messages");
+    };
+
+    dataChannel.onmessage = (event) => {
+      store.dispatch(setMessage(event.data));
+    };
+  };
+
+  dataChannel = peerConnection.createDataChannel("chat");
+
+  dataChannel.onopen = () => {
+    console.log("chat data channel successfully opened");
   };
 
   peerConnection.onicecandidate = (event) => {
@@ -261,4 +282,8 @@ const resetCallDataAfterHangUp = () => {
 export const resetCallData = () => {
   connectedUserSocketId = null;
   store.dispatch(setCallState(callStates.CALL_AVAILABLE));
+};
+
+export const sendMessageUsingDataChannel = (message) => {
+  dataChannel.send(message);
 };
