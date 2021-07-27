@@ -136,6 +136,7 @@ const handleBroadcastEvents = (data) => {
         }
       }
       store.dispatch(dashboardActions.setGroupCalls(groupCallRooms));
+      break;
     default:
       break;
   }
