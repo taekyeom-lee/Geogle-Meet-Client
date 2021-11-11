@@ -7,6 +7,7 @@ import {
   setGroupCallIncomingStreams,
   clearGroupCallData,
 } from "../../store/actions/callActions";
+import { getTurnServers } from "./TURN";
 
 let myPeer;
 let myPeerId;
@@ -14,10 +15,10 @@ let groupCallRoomId;
 let groupCallHost = false;
 
 export const connectWithMyPeer = () => {
-  myPeer = new window.Peer(undefined, {
-    path: "/peerjs",
-    host: "/",
-    port: "5000",
+  myPeer = new window.Peer(undefined, {    
+    config: {
+      iceServers: [...getTurnServers(), { url: 'stun:stun.1und1.de:3478'}]
+    }
   });
 
   myPeer.on("open", (id) => {
